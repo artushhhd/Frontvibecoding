@@ -1,0 +1,133 @@
+@import 'tailwindcss';
+
+/* =========================
+   Course Card
+========================= */
+
+.course-card {
+  @apply w-full max-w-sm overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-md transition duration-200 hover:-translate-y-1 hover:shadow-xl;
+}
+
+.course-image {
+  @apply h-52 w-full object-cover;
+}
+
+.course-content {
+  @apply p-5;
+}
+
+.course-title {
+  @apply mb-2 text-2xl font-bold text-gray-900;
+}
+
+.course-description {
+  @apply mb-4 text-sm leading-6 text-gray-600;
+}
+
+.course-info {
+  @apply mb-4 space-y-2 text-sm;
+}
+
+.course-price {
+  @apply font-semibold text-gray-900;
+}
+
+.course-author {
+  @apply text-gray-500;
+}
+
+.course-likes {
+  @apply text-gray-500;
+}
+
+/* =========================
+   Course Actions
+========================= */
+
+.course-actions {
+  @apply flex flex-wrap gap-2;
+}
+
+.course-button {
+  @apply rounded-lg px-4 py-2 text-sm font-medium text-white transition disabled:cursor-not-allowed disabled:opacity-50;
+}
+
+.like-button {
+  @apply bg-blue-600 hover:bg-blue-700;
+}
+
+.buy-button {
+  @apply bg-green-600 hover:bg-green-700;
+}
+
+.delete-button {
+  @apply bg-red-600 hover:bg-red-700;
+}
+
+/* =========================
+   Course Message
+========================= */
+
+.course-message {
+  @apply mt-4 rounded-lg bg-gray-100 px-3 py-2 text-sm text-gray-700;
+}
+
+/* =========================
+   Form Inputs
+========================= */
+
+.course-input {
+  @apply w-full rounded-lg border border-gray-700 bg-black px-4 py-3 text-white outline-none transition;
+}
+
+.course-input::placeholder {
+  @apply text-gray-400;
+}
+
+.course-input:focus {
+  @apply border-blue-500 ring-2 ring-blue-500;
+}
+
+/* =========================
+   Textarea
+========================= */
+
+.course-textarea {
+  @apply w-full resize-y rounded-lg border border-gray-700 bg-black px-4 py-3 text-white outline-none transition;
+}
+
+.course-textarea::placeholder {
+  @apply text-gray-400;
+}
+
+.course-textarea:focus {
+  @apply border-blue-500 ring-2 ring-blue-500;
+}
+
+/* =========================
+   Select
+========================= */
+
+.course-select {
+  @apply w-full rounded-lg border border-gray-700 bg-black px-4 py-3 text-white outline-none transition;
+}
+
+.course-select:focus {
+  @apply border-blue-500 ring-2 ring-blue-500;
+}
+
+/* =========================
+   Form Labels
+========================= */
+
+.course-label {
+  @apply mb-2 block text-sm font-medium text-gray-900;
+}
+
+/* =========================
+   Form Group
+========================= */
+
+.course-form-group {
+  @apply mb-4;
+}
