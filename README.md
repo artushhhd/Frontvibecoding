@@ -1,6 +1,6 @@
 # Frontvibecoding
 
-Frontend for a course marketplace, built with Next.js App Router + React. Talks to the Laravel API here: [BackVibeCoding](https://github.com/yourname/BackVibeCoding).
+Frontend for a course marketplace, built with Next.js App Router + React. Talks to the Laravel API here: [BackVibeCoding](https://github.com/artushhhd/BackVibeCoding).
 
 ## Stack
 
