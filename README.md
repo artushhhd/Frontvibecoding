@@ -1,36 +1,59 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Frontvibecoding
 
-## Getting Started
+Frontend for a course marketplace, built with Next.js App Router + React. Talks to the Laravel API here: [BackVibeCoding](https://github.com/yourname/BackVibeCoding).
 
-First, run the development server:
+## Stack
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- Next.js 16 (App Router), React 19
+- Plain CSS
+- `lib/api.js` — small fetch wrapper that attaches the Bearer token and clears it on a 401
+
+## What's implemented
+
+- Register / login, token stored in `localStorage` via `lib/api.js`
+- Top bar showing the logged-in user, hidden on `/login` and `/register`
+- Course feed (`/`) — loads profile + courses in parallel, shows a create-course form to logged-in users
+- Create a course with an image
+- Like / unlike, buy a course — each action calls the API and merges the updated course back into local state (no full page refetch)
+- Delete a course — only shown to the course's own author
+- Profile page
+
+## Structure
+
+```
+app/
+├── page.js            # course feed (root route)
+├── Course.jsx           # single course card — like/buy/delete
+├── addCourse.jsx         # create course form
+├── TopBar.jsx              # nav bar, fetches current user
+├── login/                   # login page
+├── register/                 # register page
+├── profile/                    # profile page
+└── layout.js
+lib/
+└── api.js               # token storage + authenticated fetch helper
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Connecting to the backend
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+```
+NEXT_PUBLIC_API_URL=http://localhost:8000/api
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+All requests go through `authFetch()` in `lib/api.js`, so the token and headers are handled in one place instead of being repeated per page.
 
-## Learn More
+## Running locally
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+npm install
+cp .env.example .env.local   # set NEXT_PUBLIC_API_URL
+npm run dev
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Runs on `http://localhost:3000`. Needs the backend running too ([BackVibeCoding](https://github.com/yourname/BackVibeCoding)).
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Known gaps
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- role is fetched (`user.role`) and checked in `TopBar.jsx`, but there's no page it actually gates yet
+- no client-side form validation, relies on server error messages
+- no automated tests yet
