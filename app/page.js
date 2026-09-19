@@ -1,106 +1,106 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
+import { toast } from 'react-hot-toast';
 import AddCourse from './addCourse';
 import Course from './Course';
 import { authFetch, getToken } from '@/lib/api';
 
 export default function CoursesPage() {
   const router = useRouter();
-  const [user, setUser] = useState(null);
-  const [courses, setCourses] = useState([]);
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(true);
+  const queryClient = useQueryClient();
 
-  useEffect(() => {
-    let cancelled = false;
+  // Fetch Profile
+  const { data: profileData, isLoading: profileLoading, isError: profileError } = useQuery({
+    queryKey: ['profile'],
+    queryFn: async () => {
+      if (!getToken()) throw new Error('No token found');
+      const res = await authFetch('/profile');
+      if (!res.ok) throw new Error('Session expired');
+      return res.json();
+    },
+    retry: false,
+    onError: () => router.replace('/login'),
+  });
 
-    async function loadCourses() {
-      if (!getToken()) {
-        router.replace('/login');
-        return;
-      }
+  // Fetch Courses
+  const { data: coursesData, isLoading: coursesLoading, isError: coursesError } = useQuery({
+    queryKey: ['courses'],
+    queryFn: async () => {
+      const res = await authFetch('/courses');
+      if (!res.ok) throw new Error('Courses could not be loaded');
+      const data = await res.json();
+      return data.courses;
+    },
+    enabled: !!profileData,
+  });
 
-      try {
-        const [profileResponse, coursesResponse] = await Promise.all([
-          authFetch('/profile'),
-          authFetch('/courses'),
-        ]);
-
-        if (!profileResponse.ok) {
-          router.replace('/login');
-          return;
-        }
-
-        const profileData = await profileResponse.json();
-
-        if (!coursesResponse.ok) {
-          const data = await coursesResponse.json();
-          throw new Error(data.message || 'Courses could not be loaded.');
-        }
-
-        const coursesData = await coursesResponse.json();
-
-        if (!cancelled) {
-          setUser(profileData.user);
-          setCourses(coursesData.courses);
-        }
-      } catch (requestError) {
-        if (!cancelled) {
-          setError(requestError.message || 'Network error.');
-        }
-      } finally {
-        if (!cancelled) {
-          setLoading(false);
-        }
-      }
-    }
-
-    loadCourses();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [router]);
-
-  const replaceCourse = (updatedCourse) => {
-    setCourses((current) =>
-      current.map((course) => (course.id === updatedCourse.id ? updatedCourse : course))
+  if (profileLoading || coursesLoading) {
+    return (
+      <div className=\"flex items-center justify-center min-h-screen\">
+        <p className=\"text-lg font-medium text-gray-500 animate-pulse\">Loading your vibe...</p>
+      </div>
     );
-  };
+  }
+
+  if (profileError || coursesError) {
+    return (
+      <div className=\"flex items-center justify-center min-h-screen\">
+        <div className=\"text-center p-8 bg-red-50 rounded-lg border border-red-200\">
+          <p className=\"text-red-600 font-semibold\">{profileError?.message || coursesError?.message || 'Something went wrong'}</p>
+          <button 
+            onClick={() => router.replace('/login')}
+            className=\"mt-4 px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors\"
+          >
+            Go to Login
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <main>
-      <h1>Courses</h1>
+    <main className=\"max-w-6xl mx-auto p-6 space-y la-8\">
+      <div className=\"flex items-center justify-between mb-8\">
+        <h1 className=\"text-4xl font-bold tracking-tight text-gray-900\">Course Library</h1>
+        <div className=\"text-sm text-gray-500\">
+          Welcome back, <span className=\"font-semibold text-gray-800\">{profileData?.user?.name}</span>
+        </div>
+      </div>
 
-      {loading && <p>Loading courses...</p>}
-      {error && <p>{error}</p>}
+      <div className=\"bg-white p-6 rounded-2xl shadow-sm border border-gray-100 mb-10">
+        <AddCourse 
+          onCreated={() => {
+            queryClient.invalidateQueries({ queryKey: ['courses'] });
+            toast.success('Course added successfully!');
+          }} 
+        />
+      </div>
 
-      {!loading && user && (
-        <>
-          <AddCourse onCreated={(course) => setCourses((current) => [course, ...current])} />
-
-          <section>
-            <h2>All courses</h2>
-            {courses.length === 0 ? (
-              <p>No courses yet.</p>
-            ) : (
-              courses.map((course) => (
-                <Course
-                  key={course.id}
-                  course={course}
-                  currentUser={user}
-                  onCourseChange={replaceCourse}
-                  onDeleted={(courseId) =>
-                    setCourses((current) => current.filter((course) => course.id !== courseId))
-                  }
-                />
-              ))
-            )}
-          </section>
-        </>
-      )}
+      <section className=\"space-y-6\">
+        <h2 className=\"text-2xl font-semibold text-gray-800\">All available courses</h2>
+        <div className=\"grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {coursesData?.length === 0 ? (
+            <div className=\"col-span-full text-center py-12 bg-gray-50 rounded-xl border-2 border-dashed border-gray-200">
+              <p className=\"text-gray-500\">No courses available yet. Be the first to add one!</p>
+            </div>
+          ) : (
+            coursesData?.map((course) => (
+              <Course
+                key={course.id}
+                course={course}
+                currentUser={profileData?.user}
+                onCourseChange={() => queryClient.invalidateQueries({ queryKey: ['courses'] })}
+                onDeleted={() => {
+                  queryClient.invalidateQueries({ queryKey: ['courses'] });
+                  toast.success('Course deleted');
+                }}
+              />
+            ))
+          )}
+        </div>
+      </section>
     </main>
   );
 }
