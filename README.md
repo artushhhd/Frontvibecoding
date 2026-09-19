@@ -6,7 +6,7 @@
 This repository contains the earlier Next.js implementation of the course platform frontend. It is preserved as part of the project's development history.
 
 ## backend 
-> backend  **[bacendVibeCoding](https://github.com/artushhhd/BackVibeCoding)**
+> backend  **[backendVibeCoding](https://github.com/artushhhd/BackVibeCoding)**
 
 ## Project Overview
 
