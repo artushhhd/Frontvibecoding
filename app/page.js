@@ -11,25 +11,22 @@ export default function CoursesPage() {
   const router = useRouter();
   const queryClient = useQueryClient();
 
-  // Fetch Profile
-  const { data: profileData, isLoading: profileLoading, isError: profileError } = useQuery({
+  const { data: profileData, isLoading: profileLoading } = useQuery({
     queryKey: ['profile'],
     queryFn: async () => {
-      if (!getToken()) throw new Error('No token found');
+      if (!getToken()) throw new Error('No token');
       const res = await authFetch('/profile');
       if (!res.ok) throw new Error('Session expired');
       return res.json();
     },
     retry: false,
-    onError: () => router.replace('/login'),
   });
 
-  // Fetch Courses
-  const { data: coursesData, isLoading: coursesLoading, isError: coursesError } = useQuery({
+  const { data: coursesData, isLoading: coursesLoading } = useQuery({
     queryKey: ['courses'],
     queryFn: async () => {
       const res = await authFetch('/courses');
-      if (!res.ok) throw new Error('Courses could not be loaded');
+      if (!res.ok) throw new Error('Failed to load');
       const data = await res.json();
       return data.courses;
     },
@@ -38,67 +35,73 @@ export default function CoursesPage() {
 
   if (profileLoading || coursesLoading) {
     return (
-      <div className=\"flex items-center justify-center min-h-screen\">
-        <p className=\"text-lg font-medium text-gray-500 animate-pulse\">Loading your vibe...</p>
-      </div>
-    );
-  }
-
-  if (profileError || coursesError) {
-    return (
-      <div className=\"flex items-center justify-center min-h-screen\">
-        <div className=\"text-center p-8 bg-red-50 rounded-lg border border-red-200\">
-          <p className=\"text-red-600 font-semibold\">{profileError?.message || coursesError?.message || 'Something went wrong'}</p>
-          <button 
-            onClick={() => router.replace('/login')}
-            className=\"mt-4 px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors\"
-          >
-            Go to Login
-          </button>
+      <div className=\"flex items-center justify-center min-h-screen bg-[#fafafa]\">
+        <div className=\"flex flex-col items-center gap-3\">
+          <div className=\"w-6 h-6 border-2 border-gray-200 border-t-black rounded-full animate-spin\" />
+          <p className=\"text-xs font-medium text-gray-400 tracking-widest uppercase\">Loading</p>
         </div>
       </div>
     );
   }
 
   return (
-    <main className=\"max-w-6xl mx-auto p-6 space-y la-8\">
-      <div className=\"flex items-center justify-between mb-8\">
-        <h1 className=\"text-4xl font-bold tracking-tight text-gray-900\">Course Library</h1>
-        <div className=\"text-sm text-gray-500\">
-          Welcome back, <span className=\"font-semibold text-gray-800\">{profileData?.user?.name}</span>
+    <main className=\"max-w-6xl mx-auto px-6 py-16 space-y-20 bg-[#fafafa] min-h-screen font-sans\">
+      <header className=\"flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-gray-100 pb-12\">
+        <div className=\"space-y-3\">
+          <h1 className=\"text-6xl font-bold tracking-tighter text-black\">Library</h1>
+          <p className=\"text-gray-400 font-light text-lg\">Curated knowledge for the modern era.</p>
         </div>
-      </div>
+        <div className=\"flex items-center gap-3 px-5 py-2 bg-white border border-gray-100 rounded-full shadow-sm">
+          <div className=\"w-2 h-2 bg-green-500 rounded-full animate-pulse\" />
+          <span className=\"text-xs font-medium text-gray-600\">{profileData?.user?.name}</span>
+        </div>
+      </header>
 
-      <div className=\"bg-white p-6 rounded-2xl shadow-sm border border-gray-100 mb-10">
-        <AddCourse 
-          onCreated={() => {
-            queryClient.invalidateQueries({ queryKey: ['courses'] });
-            toast.success('Course added successfully!');
-          }} 
-        />
-      </div>
-
-      <section className=\"space-y-6\">
-        <h2 className=\"text-2xl font-semibold text-gray-800\">All available courses</h2>
-        <div className=\"grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {coursesData?.length === 0 ? (
-            <div className=\"col-span-full text-center py-12 bg-gray-50 rounded-xl border-2 border-dashed border-gray-200">
-              <p className=\"text-gray-500\">No courses available yet. Be the first to add one!</p>
-            </div>
-          ) : (
-            coursesData?.map((course) => (
-              <Course
-                key={course.id}
-                course={course}
-                currentUser={profileData?.user}
-                onCourseChange={() => queryClient.invalidateQueries({ queryKey: ['courses'] })}
-                onDeleted={() => {
+      <section className=\"grid grid-cols-1 lg:grid-cols-3 gap-16\">
+        <div className=\"lg:col-span-1">
+          <div className=\"sticky top-8 space-y-8">
+            <div className=\"bg-white border border-gray-100 rounded-3xl p-8 shadow-sm">
+              <h3 className=\"text-xs font-bold uppercase tracking-widest text-gray-400 mb-6\">Publish Course</h3>
+              <AddCourse 
+                onCreated={() => {
                   queryClient.invalidateQueries({ queryKey: ['courses'] });
-                  toast.success('Course deleted');
-                }}
+                  toast.success('Course published');
+                }} 
               />
-            ))
-          )}
+            </div>
+            <div className=\"p-8 bg-black rounded-3xl text-white shadow-2xl transform hover:scale-[1.02] transition-transform duration-300">
+              <p className=\"text-[10px] font-medium text-gray-400 uppercase tracking-widest mb-2\">Your Balance</p>
+              <p className=\"text-4xl font-light tracking-tight\">${profileData?.user?.balance || '0.00'}</p>
+            </div>
+          </div>
+        </div>
+
+        <div className=\"lg:col-span-2 space-y-12\">
+          <div className=\"flex items-center gap-6">
+            <h2 className=\"text-2xl font-medium text-black\">Available Modules</h2>
+            <div className=\"h-px flex-grow bg-gray-200\" />
+          </div>
+
+          <div className=\"grid grid-cols-1 md:grid-cols-2 gap-10\">
+            {coursesData?.length === 0 ? (
+              <div className=\"col-span-full py-24 text-center border border-dashed border-gray-200 rounded-3xl bg-white\">
+                <p className=\"text-gray-400 font-light\">The library is currently empty.</p>
+              </div>
+            ) : (
+              coursesData?.map((course) => (
+                <Course
+                  key={course.id}
+                  course={course}
+                  currentUser={profileData?.user}
+                  onCourseChange={() => queryClient.invalidateQueries({ queryKey: ['courses'] })}
+                  onDeleted={() => {
+                    queryClient.invalidateQueries({ queryKey: ['courses'] });
+                    toast.success('Removed from library');
+                  }}
+                />
+              ))
+            )}
+          </div>
         </div>
       </section>
     </main>
