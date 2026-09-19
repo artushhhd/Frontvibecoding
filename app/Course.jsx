@@ -1,6 +1,5 @@
 'use client';
 
-import { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { authFetch } from '@/lib/api';
 import { toast } from 'react-hot-toast';
@@ -18,118 +17,125 @@ export default function Course({
       const res = await authFetch(`/courses/${course.id}/like`, {
         method: isLiked ? 'DELETE' : 'POST',
       });
-      if (!res.ok) throw new Error('Failed to update like');
+      if (!res.ok) throw new Error('Like failed');
       return res.status === 204 ? null : res.json();
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['courses'] });
-      toast.success(course.liked_by_current_user ? 'Like removed' : 'Course liked!');
+    onMutate: async () => {
+      await queryClient.cancelQueries({ queryKey: ['courses'] });
+      const previousCourses = queryClient.getQueryData(['courses']);
+      queryClient.setQueryData(['courses'], (old = []) => 
+        old.map(c => c.id === course.id ? { ...c, liked_by_current_user: !c.liked_by_current_user } : c)
+      );
+      return { previousCourses };
     },
-    onError: (err) => toast.error(err.message),
+    onError: (err, _, context) => {
+      queryClient.setQueryData(['courses'], context.previousCourses);
+      toast.error(err.message);
+    },
+    onSettled: () => queryClient.invalidateQueries({ queryKey: ['courses'] }),
   });
 
   const { mutate: buyCourse, isPending: isBuying } = useMutation({
     mutationFn: async () => {
-      const res = await authFetch(`/courses/${course.id}/purchase`, {
-        method: 'POST',
-      });
+      const res = await authFetch(`/courses/${course.id}/purchase`, { method: 'POST' });
       if (!res.ok) {
         const data = await res.json();
         throw new Error(data.message || 'Purchase failed');
       }
       return res.json();
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['courses'] });
-      toast.success('Course purchased successfully!');
+    onMutate: async () => {
+      await queryClient.cancelQueries({ queryKey: ['courses'] });
+      const previousCourses = queryClient.getQueryData(['courses']);
+      queryClient.setQueryData(['courses'], (old = []) => 
+        old.map(c => c.id === course.id ? { ...c, purchased_by_current_user: true } : c)
+      );
+      return { previousCourses };
     },
-    onError: (err) => toast.error(err.message),
+    onError: (err, _, context) => {
+      queryClient.setQueryData(['courses'], context.previousCourses);
+      toast.error(err.message);
+    },
+    onSettled: () => queryClient.invalidateQueries({ queryKey: ['courses'] }),
   });
 
   const { mutate: deleteCourse, isPending: isDeleting } = useMutation({
     mutationFn: async () => {
-      const res = await authFetch(`/courses/${course.id}`, {
-        method: 'DELETE',
-      });
+      const res = await authFetch(`/courses/${course.id}`, { method: 'DELETE' });
       if (!res.ok) throw new Error('Delete failed');
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['courses'] });
-      toast.success('Course removed');
+      toast.success('Removed');
     },
     onError: (err) => toast.error(err.message),
   });
 
-  const isProcessing = isLiking || isBuying || isDeleting;
-
   return (
-    <article className=\"bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow duration-300 flex flex-col\">
-      {course.image_url && (
-        <div className=\"aspect-video w-full overflow-hidden bg-gray-200\">
+    <article className=\"bg-white border border-gray-100 rounded-3xl p-6 transition-all duration-500 hover:border-black group flex flex-col h-full\">
+      <div className=\"aspect-video w-full overflow-hidden rounded-2xl bg-gray-50 mb-6 relative group-hover:shadow-inner transition-all\">
+        {course.image_url ? (
           <img
             src={course.image_url}
             alt={course.title}
-            className=\"w-full h-full object-cover hover:scale-105 transition-transform duration-500\"
+            className=\"w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700 scale-100 group-hover:scale-105\"
           />
-        </div>
-      )}
+        ) : (
+          <div className=\"w-full h-full flex items-center justify-center text-gray-300 text-[10px] uppercase tracking-widest\">No Image Available</div>
+        )}
+      </div>
 
-      <div className=\"p-5 flex flex-col flex-grow\">
-        <div className=\"flex justify-between items-start mb-2\">
-          <h2 className=\"text-xl font-bold text-gray-900 line-clamp-1\">
+      <div className=\"flex-grow space-y-4\">
+        <div className=\"flex justify-between items-start gap-2\">
+          <h2 className=\"text-xl font-semibold text-black leading-tight group-hover:text-indigo-600 transition-colors duration-300\">
             {course.title}
           </h2>
-          <span className=\"bg-blue-100 text-blue-700 text-xs font-bold px-2 py-1 rounded-full\">
-            ${course.price}
-          </span>
+          <span className=\"text-sm font-mono text-gray-400\">${course.price}</span>
         </div>
 
-        <p className=\"text-gray-600 text-sm line-clamp-3 mb-4 flex-grow\">
+        <p className=\"text-gray-500 text-sm leading-relaxed line-clamp-2\">
           {course.description}
         </p>
 
-        <div className=\"flex items-center justify-between text-xs text-gray-500 mb-6 py-3 border-t border-b border-gray-50\">
-          <div className=\"flex items-center gap-1\">
-            <span className=\"font-medium\">Author:</span> {course.author?.name || 'Unknown'}
+        <div className=\"flex items-center justify-between py-4 border-y border-gray-50 text-[10px] uppercase tracking-tighter text-gray-400\">
+          <div className=\"flex items-center gap-2\">
+            <span>Author:</span> <span className=\"text-gray-700 font-medium\">{course.author?.name || 'Unknown'}</span>
           </div>
-          <div className=\"flex items-center gap-1\">
-            <span className=\"font-medium\">Likes:</span> {course.likes_count}
+          <div className=\"flex items-center gap-2\">
+            <span>Likes:</span> <span className=\"text-gray-700 font-medium\">{course.likes_count}</span>
           </div>
         </div>
 
-        <div className=\"grid grid-cols-2 gap-3\">
+        <div className=\"grid grid-cols-2 gap-3 mt-auto pt-2\">
           <button
-            type=\"button\"
             onClick={() => toggleLike()}
-            disabled={isProcessing}
-            className={`py-2 px-4 rounded-xl text-sm font-semibold transition-all duration-200 flex items-center justify-center gap-2 ${
+            disabled={isLiking}
+            className={`py-2.5 rounded-xl text-xs font-bold transition-all duration-300 border ${
               course.liked_by_current_user 
-                ? 'bg-red-50 text-red-600 hover:bg-red-100' 
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                ? 'bg-black text-white border-black' 
+                : 'bg-white text-gray-600 border-gray-100 hover:border-black hover:text-black'
             }`}
           >
-            {course.liked_by_current_user ? '❤️ Unlike' : '🤍 Like'}
+            {course.liked_by_current_user ? 'Liked' : 'Like'}
           </button>
 
           <button
-            type=\"button\"
             onClick={() => buyCourse()}
-            disabled={isProcessing || course.purchased_by_current_user}
-            className={`py-2 px-4 rounded-xl text-sm font-semibold transition-all duration-200 flex items-center justify-center gap-2 ${
+            disabled={isBuying || course.purchased_by_current_user}
+            className={`py-2.5 rounded-xl text-xs font-bold transition-all duration-300 border ${
               course.purchased_by_current_user
-                ? 'bg-green-100 text-green-700 cursor-default'
-                : 'bg-indigo-600 text-white hover:bg-indigo-700 shadow-sm shadow-indigo-200'
+                ? 'bg-gray-50 text-gray-300 border-gray-50 cursor-default'
+                : 'bg-white text-black border-black hover:bg-black hover:text-white'
             }`}
           >
-            {course.purchased_by_current_user ? '✅ Owned' : '🛒 Buy'}
+            {course.purchased_by_current_user ? 'Owned' : 'Purchase'}
           </button>
 
           {isAuthor && (
             <button
-              type=\"button\"
               onClick={() => deleteCourse()}
-              disabled={isProcessing}
-              className=\"col-span-2 py-2 px-4 rounded-xl text-sm font-medium text-red-500 hover:bg-red-50 transition-colors duration-200 border border-transparent hover:border-red-100\"
+              disabled={isDeleting}
+              className=\"col-span-2 py-2 text-[10px] font-medium text-gray-300 hover:text-red-500 transition-colors uppercase tracking-widest\"
             >
               Delete Course
             </button>
