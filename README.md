@@ -1,59 +1,136 @@
 # Frontvibecoding
 
-Frontend for a course marketplace, built with Next.js App Router + React. Talks to the Laravel API here: [BackVibeCoding](https://github.com/artushhhd/BackVibeCoding).
+> Previous version of the Course Platform frontend.  
+> The actively maintained version is now available in **[junior-frontend-app](https://github.com/artushhhd/junior-frontend-app)**.
 
-## Stack
+This repository contains the earlier Next.js implementation of the course platform frontend. It is preserved as part of the project's development history.
 
-- Next.js 16 (App Router), React 19
-- Plain CSS
-- `lib/api.js` — small fetch wrapper that attaches the Bearer token and clears it on a 401
+## Project Overview
 
-## What's implemented
+The application provides a frontend for a Laravel course marketplace API.
 
-- Register / login, token stored in `localStorage` via `lib/api.js`
-- Top bar showing the logged-in user, hidden on `/login` and `/register`
-- Course feed (`/`) — loads profile + courses in parallel, shows a create-course form to logged-in users
-- Create a course with an image
-- Like / unlike, buy a course — each action calls the API and merges the updated course back into local state (no full page refetch)
-- Delete a course — only shown to the course's own author
+It includes:
+
+- Authentication
+- Course browsing
+- Course creation
+- Course interactions
+- User profile
+- Centralized API communication
+
+The current version extends this foundation with a more complete application structure and administration interface.
+
+## Tech Stack
+
+| Technology | Purpose |
+|---|---|
+| Next.js 16 | React framework / App Router |
+| React 19 | UI |
+| JavaScript | Application code |
+| Fetch API | Backend communication |
+| CSS | Styling |
+
+## Implemented Features
+
+### Authentication
+
+- Registration
+- Login
+- Token persistence in `localStorage`
+- Authenticated API requests
+- Logout handling
+- Automatic token cleanup after `401 Unauthorized`
+
+### Course Platform
+
+- Course feed
+- Course creation with image upload
+- Like / unlike
+- Purchase action
+- Author-only course deletion
 - Profile page
 
-## Structure
+### API Integration
 
-```
-app/
-├── page.js            # course feed (root route)
-├── Course.jsx           # single course card — like/buy/delete
-├── addCourse.jsx         # create course form
-├── TopBar.jsx              # nav bar, fetches current user
-├── login/                   # login page
-├── register/                 # register page
-├── profile/                    # profile page
-└── layout.js
-lib/
-└── api.js               # token storage + authenticated fetch helper
-```
+All requests are centralized through `lib/api.js`.
 
-## Connecting to the backend
+The API helper is responsible for:
 
-```
+- Bearer token attachment
+- Request headers
+- API URL configuration
+- Authentication error handling
+
+The backend URL is configured through an environment variable:
+
+```env
 NEXT_PUBLIC_API_URL=http://localhost:8000/api
 ```
 
-All requests go through `authFetch()` in `lib/api.js`, so the token and headers are handled in one place instead of being repeated per page.
+## Project Structure
 
-## Running locally
+```text
+app/
+├── page.js
+├── Course.jsx
+├── addCourse.jsx
+├── TopBar.jsx
+├── login/
+├── register/
+├── profile/
+└── layout.js
+
+lib/
+└── api.js
+```
+
+## Backend
+
+This frontend was built to work with the previous Laravel API:
+
+**[BackVibeCoding](https://github.com/artushhhd/BackVibeCoding)**
+
+For the current full-stack version, use:
+
+**[junior-frontend-app](https://github.com/artushhhd/junior-frontend-app)**
+
+with:
+
+**[junior-backend-api](https://github.com/artushhhd/junior-backend-api)**
+
+## Installation
 
 ```bash
+git clone https://github.com/artushhhd/Frontvibecoding.git
+cd Frontvibecoding
+
 npm install
-cp .env.example .env.local   # set NEXT_PUBLIC_API_URL
+```
+
+Create `.env.local`:
+
+```env
+NEXT_PUBLIC_API_URL=http://localhost:8000/api
+```
+
+Start the development server:
+
+```bash
 npm run dev
 ```
 
-Runs on `http://localhost:3000`. Needs the backend running too ([BackVibeCoding](https://github.com/yourname/BackVibeCoding)).
+The application runs by default at:
 
-## Known gaps
+```text
+http://localhost:3000
+```
 
-- role is fetched (`user.role`) and checked in `TopBar.jsx`, but there's no page it actually gates yet
-- no client-side form validation, relies on server error messages
-- no automated tests yet
+The Laravel backend must be running at the configured API URL.
+
+## Project History
+
+This repository represents an earlier stage of the frontend.
+
+It is intentionally preserved to show the progression of the project from a basic course marketplace client to the current full-stack implementation.
+
+For the actively maintained version, see **[junior-frontend-app](https://github.com/artushhhd/junior-frontend-app)**.
