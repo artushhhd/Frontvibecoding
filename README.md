@@ -1,139 +1,40 @@
 # Frontvibecoding
 
-> Previous version of the Course Platform frontend.  
-> The actively maintained version is now available in **[junior-frontend-app](https://github.com/artushhhd/junior-frontend-app)**.
+> Archived: previous version of the Course Platform frontend.
 
-This repository contains the earlier Next.js implementation of the course platform frontend. It is preserved as part of the project's development history.
+This repository is kept as project history. It is not the current implementation.
 
-## backend 
-> backend  **[backendVibeCoding](https://github.com/artushhhd/BackVibeCoding)**
+## About
 
-## Project Overview
-
-The application provides a frontend for a Laravel course marketplace API.
-
-It includes:
+Frontvibecoding is an earlier Next.js client for the course marketplace. It contains the initial implementation of:
 
 - Authentication
-- Course browsing
-- Course creation
+- Course browsing and creation
 - Course interactions
 - User profile
 - Centralized API communication
+- Image upload integration
 
-The current version extends this foundation with a more complete application structure and administration interface.
+The project later evolved into the current Course Platform frontend with a broader application structure and administration interface.
 
 ## Tech Stack
 
-| Technology | Purpose |
-|---|---|
-| Next.js 16 | React framework / App Router |
-| React 19 | UI |
-| JavaScript | Application code |
-| Fetch API | Backend communication |
-| CSS | Styling |
+- Next.js 16
+- React 19
+- JavaScript
+- Fetch API
+- CSS
 
-## Implemented Features
+## Current Version
 
-### Authentication
+The maintained version is:
 
-- Registration
-- Login
-- Token persistence in `localStorage`
-- Authenticated API requests
-- Logout handling
-- Automatic token cleanup after `401 Unauthorized`
+**Frontend:** https://github.com/artushhhd/course-platform-frontend
 
-### Course Platform
+**Backend:** https://github.com/artushhhd/course-platform-backend
 
-- Course feed
-- Course creation with image upload
-- Like / unlike
-- Purchase action
-- Author-only course deletion
-- Profile page
-
-### API Integration
-
-All requests are centralized through `lib/api.js`.
-
-The API helper is responsible for:
-
-- Bearer token attachment
-- Request headers
-- API URL configuration
-- Authentication error handling
-
-The backend URL is configured through an environment variable:
-
-```env
-NEXT_PUBLIC_API_URL=http://localhost:8000/api
-```
-
-## Project Structure
-
-```text
-app/
-├── page.js
-├── Course.jsx
-├── addCourse.jsx
-├── TopBar.jsx
-├── login/
-├── register/
-├── profile/
-└── layout.js
-
-lib/
-└── api.js
-```
-
-## Backend
-
-This frontend was built to work with the previous Laravel API:
-
-**[BackVibeCoding](https://github.com/artushhhd/BackVibeCoding)**
-
-For the current full-stack version, use:
-
-**[junior-frontend-app](https://github.com/artushhhd/junior-frontend-app)**
-
-with:
-
-**[junior-backend-api](https://github.com/artushhhd/junior-backend-api)**
-
-## Installation
-
-```bash
-git clone https://github.com/artushhhd/Frontvibecoding.git
-cd Frontvibecoding
-
-npm install
-```
-
-Create `.env.local`:
-
-```env
-NEXT_PUBLIC_API_URL=http://localhost:8000/api
-```
-
-Start the development server:
-
-```bash
-npm run dev
-```
-
-The application runs by default at:
-
-```text
-http://localhost:3000
-```
-
-The Laravel backend must be running at the configured API URL.
+Use the current repositories for portfolio review and development.
 
 ## Project History
 
-This repository represents an earlier stage of the frontend.
-
-It is intentionally preserved to show the progression of the project from a basic course marketplace client to the current full-stack implementation.
-
-For the actively maintained version, see **[junior-frontend-app](https://github.com/artushhhd/junior-frontend-app)**.
+This repository is intentionally preserved as an earlier development stage. It demonstrates the progression from a basic course client to the current full-stack application.
