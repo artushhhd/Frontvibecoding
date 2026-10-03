@@ -1,40 +1,27 @@
 # Frontvibecoding
 
-> Archived: previous version of the Course Platform frontend.
+> Archived project history — not the maintained Course Platform frontend.
 
-This repository is kept as project history. It is not the current implementation.
+This repository is intentionally kept as an earlier development stage and is not a primary portfolio project.
 
-## About
+## Earlier Implementation
 
-Frontvibecoding is an earlier Next.js client for the course marketplace. It contains the initial implementation of:
-
-- Authentication
+- Next.js authentication
 - Course browsing and creation
 - Course interactions
 - User profile
 - Centralized API communication
 - Image upload integration
 
-The project later evolved into the current Course Platform frontend with a broader application structure and administration interface.
+The project later evolved into the current Course Platform client with a broader application structure and administration UI.
 
-## Tech Stack
+## Status
 
-- Next.js 16
-- React 19
-- JavaScript
-- Fetch API
-- CSS
+**Archived.**
 
-## Current Version
+For current development and portfolio review:
 
-The maintained version is:
+- **Frontend:** https://github.com/artushhhd/course-platform-frontend
+- **Backend:** https://github.com/artushhhd/course-platform-backend
 
-**Frontend:** https://github.com/artushhhd/course-platform-frontend
-
-**Backend:** https://github.com/artushhhd/course-platform-backend
-
-Use the current repositories for portfolio review and development.
-
-## Project History
-
-This repository is intentionally preserved as an earlier development stage. It demonstrates the progression from a basic course client to the current full-stack application.
+Keeping this repository separate makes the evolution visible without competing with the maintained version.
