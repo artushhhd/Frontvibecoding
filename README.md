@@ -1,10 +1,10 @@
 # Frontvibecoding
 
-> Archived project history — not the maintained Course Platform frontend.
+> **Archived — development history**
 
-This repository is intentionally kept as an earlier development stage and is not a primary portfolio project.
+Earlier Next.js frontend implementation that preceded the current Course Platform frontend.
 
-## Earlier Implementation
+## Earlier Work
 
 - Next.js authentication
 - Course browsing and creation
@@ -13,15 +13,9 @@ This repository is intentionally kept as an earlier development stage and is not
 - Centralized API communication
 - Image upload integration
 
-The project later evolved into the current Course Platform client with a broader application structure and administration UI.
+## Current Project
 
-## Status
+Use the maintained repositories for portfolio review:
 
-**Archived.**
-
-For current development and portfolio review:
-
-- **Frontend:** https://github.com/artushhhd/course-platform-frontend
-- **Backend:** https://github.com/artushhhd/course-platform-backend
-
-Keeping this repository separate makes the evolution visible without competing with the maintained version.
+- https://github.com/artushhhd/course-platform-frontend
+- https://github.com/artushhhd/course-platform-backend
