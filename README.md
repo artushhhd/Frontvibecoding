@@ -1,6 +1,6 @@
 # Frontvibecoding
 
-> **Archived — development history**
+> **Legacy implementation — development history**
 
 Earlier Next.js frontend implementation that preceded the current Course Platform frontend.
 
